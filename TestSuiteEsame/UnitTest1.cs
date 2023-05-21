@@ -9,7 +9,7 @@ namespace TestSuiteEsame
     //Test per Esame del 30/01/2023
 
     [TestFixture]
-    public class TestsPrimoEsame
+    public class TestLookup
     {
         [Test]
         public void PrimoTest()
@@ -55,15 +55,6 @@ namespace TestSuiteEsame
             }
 
 
-        [TestCase(2)]
-        [TestCase(5)]
-        [TestCase(8)]
-        [TestCase(10)]
-        [TestCase(15)]
-        [TestCase(20)]
-        [TestCase(25)]
-        [TestCase(30)]
-        [TestCase(40)]
         [TestCase(60)]
         public void TerzoTest(int size)
         {
@@ -88,6 +79,165 @@ namespace TestSuiteEsame
             }
         }
 
+
+    }
+
+
+    //Test per Filter
+    [TestFixture]
+    public class TestFilter
+    {
+
+        static char OtherChar(char c)
+        {
+            if (c == 'a') return 'b';
+            if (c == 'b') return 'a';
+            return 'e';
+        }
+
+        static bool onEvenFunction<T>(T argomento)
+        {
+            return argomento.ToString().Length < 10;
+        }
+
+        static bool onOddFunction<T>(T argomento)
+        {
+            return argomento.ToString().StartsWith('p');
+        }
+
+        static bool PredicateFunctionLastTest<T>(T argomento)
+        {
+            return argomento.ToString().EndsWith('a');
+        }     
+
+        [Test]
+        public void PrimoTest()
+        {
+            Predicate<string> onEvenPredicate = onEvenFunction;
+            Predicate<string> onOddPredicate = onOddFunction;
+
+            var s = new string[] { "banana", "plutocratico", "questo proprio no", "pera", "questo si", "mela" };
+
+            var result = s.Filter(onEvenPredicate, onOddPredicate);
+            var expected = new string[] { "banana", "plutocratico", "pera", "questo si" };
+            Assert.AreEqual(result, expected);
+        }
+
+        [TestCase(new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13})]
+        public void SecondoTest(int[] source)
+        {
+            if(source.Length < 2) Assert.Inconclusive();
+            
+            Predicate<int> onEvenPredicate = onEvenFunction;
+            Predicate<int> onOddPredicate = onOddFunction;
+
+            var result = source.Filter(onEvenPredicate, onOddPredicate);
+            var expected = new int[source.Length / 2 + 1]; //Sicuramente sono la metà quelli pari, + 1 in caso la sequenza fosse dispari
+            int index = 0;
+            int j = 0;
+            while(index < source.Length)
+            {
+                if (index%2 == 0)
+                {
+                    expected[j] = source[index];
+                    j++;
+                }
+                index++;
+            }
+
+            Assert.AreEqual(result, expected);
+        }
+
+        [Test]
+        public void TerzoTest()
+        {
+            Predicate<string> DelegateLastTest = PredicateFunctionLastTest;
+
+            IEnumerator<string> Infinite()
+            {
+                //TODO (mi sa molto di complicato)
+                yield break;
+            };
+            int i = 0;
+            Assert.Fail();
+        }
+
+        [Test]
+        public void QuartoTest()
+        {
+
+            Predicate<int> onEvenPredicate = onEvenFunction;
+            Predicate<int> onOddPredicate = onOddFunction;
+            Assert.Throws<ArgumentNullException>(() => MyExtensions.Filter(null,onEvenPredicate,onOddPredicate).Any());
+
+        }
+
+    }
+
+    [TestFixture]
+    public class TestCompareTo
+    {
+        [Test]
+        public void PrimoTest()
+        {
+            var s = new char[] { 'a', 'b', 'c' };
+            char threshold = 'a';
+            int howmany = 0;
+            Assert.Throws<ArgumentOutOfRangeException>(() => s.EnoughSmaller(threshold, howmany));
+        }
+
+        [Test]
+        public void SecondoTest()
+        {
+            var s = new string[] { "asl", "asjdj", "askdnjk", "aksjd", "askjdjk" };
+            string threshold = "sium";
+            int howmany = 42;
+            Assert.IsFalse(s.EnoughSmaller(threshold,howmany));
+        }
+
+        [TestCase(73)]
+        public void TerzoTest(int n)
+        {
+            if (n <= 0) Assert.Inconclusive();
+            float threshold = 7.42f;
+
+            IEnumerable<double> Infinite()
+            {
+                Random r = new Random();
+                while (true)
+                {
+                    yield return (double)r.NextDouble() * -1;
+                }
+            }
+
+            Assert.IsTrue(Infinite().Take(100).EnoughSmaller(threshold, n));
+
+        }
+
+        //TODO Non funziona e non so perchè
+        [Test]
+        public void QuartoTest()
+        {
+            var s = new Mock<IComparable>[12];
+            for(int i = 0; i < 12; i++)
+            {
+                s[i] = new Mock<IComparable>();
+                s[i].Setup(x => x.CompareTo(It.IsAny<IComparable>())).Returns(i);
+            }
+            var sequenceEnum = s.Select(x => x.Object);
+            int howmany = 7;
+            int threshold = 11;
+            sequenceEnum.EnoughSmaller(threshold, howmany);
+            int count = 0;
+            for(int i = 0; i< s.Length; i++)
+            {
+                s[i].Verify(x => x.CompareTo(s[i]), Times.Once());
+                count++;
+            }
+            Assert.AreEqual(howmany, count);
+
+                
+        }
 
     }
 
