@@ -39,6 +39,13 @@
             }
         }
 
+
+        public static char LastChar(this string s)
+        {
+            if (s == null) throw new ArgumentNullException();
+            return s[s.Length - 1];
+        }
+
         //CompareTo 16/02/2023
         public static bool EnoughSmaller<T>(this IEnumerable<T> s, T threshold, int howMany) where T : IComparable
         {

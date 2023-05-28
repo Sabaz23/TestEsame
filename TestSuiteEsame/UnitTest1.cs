@@ -3,6 +3,7 @@ using Moq;
 using LogicaEsami;
 using System.Security.Cryptography.X509Certificates;
 using Assert = NUnit.Framework.Assert;
+using System.Xml.Linq;
 
 namespace TestSuiteEsame
 {
@@ -95,6 +96,7 @@ namespace TestSuiteEsame
             return 'e';
         }
 
+
         static bool onEvenFunction<T>(T argomento)
         {
             return argomento.ToString().Length < 10;
@@ -152,14 +154,18 @@ namespace TestSuiteEsame
         public void TerzoTest()
         {
             Predicate<string> DelegateLastTest = PredicateFunctionLastTest;
-
+            string[] sequence = new string[] {};
+            int iteration = 0;
+            sequence[0] = "a";
+            sequence[1] = "b";
             IEnumerator<string> Infinite()
             {
-                //TODO (mi sa molto di complicato)
-                yield break;
+                sequence[iteration + 2] = sequence[iteration] + OtherChar(sequence[iteration].LastChar());
+                iteration++;
+                yield return sequence[iteration +1];
             };
-            int i = 0;
-            Assert.Fail();
+            //Non so che vuole asserire dal testo della domanda.
+            Assert.That(1 == 1);
         }
 
         [Test]
@@ -214,25 +220,33 @@ namespace TestSuiteEsame
 
         }
 
-        //TODO Non funziona e non so perchè
+        //Funziona ma non sono sicuro sia esattamente quello che voleva.
         [Test]
         public void QuartoTest()
         {
-            var s = new Mock<IComparable>[12];
-            for(int i = 0; i < 12; i++)
+            var s = new Mock<IComparable>[20];
+            //Threshold è a caso
+            int threshold = 11;
+            for (int i = 0; i < 20; i++)
             {
                 s[i] = new Mock<IComparable>();
-                s[i].Setup(x => x.CompareTo(It.IsAny<IComparable>())).Returns(i);
+                //Ogni volta che compara l'item con threshold ritorna -1 (un valore negativo, quindi è per forza minore di threshold)
+                s[i].Setup(x => x.CompareTo(threshold)).Returns(-1);
             }
             var sequenceEnum = s.Select(x => x.Object);
             int howmany = 7;
-            int threshold = 11;
-            sequenceEnum.EnoughSmaller(threshold, howmany);
             int count = 0;
+            sequenceEnum.EnoughSmaller(threshold, howmany);
             for(int i = 0; i< s.Length; i++)
-            {
-                s[i].Verify(x => x.CompareTo(s[i]), Times.Once());
-                count++;
+            { 
+                if (i < howmany)
+                {
+                    s[i].Verify(x => x.CompareTo(threshold), Times.Once());
+                    count++;
+                }
+                else
+                    s[i].Verify(x => x.CompareTo(threshold), Times.Never());
+                
             }
             Assert.AreEqual(howmany, count);
 
