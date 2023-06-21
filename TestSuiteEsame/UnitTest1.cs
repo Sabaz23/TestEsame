@@ -255,5 +255,51 @@ namespace TestSuiteEsame
 
     }
 
+    [TestFixture]
+    public class TestMultipleApply
+    {
+        //Durante l'esame queste non vanno implementate.
+        //Logicamente si farebbe in maniera diversa, ma queste sono di esempio per semplicità di utilizzo
+        //(anche perchè nell'esame viene scritto che la sequenza è da "interi a interi"
+        //pertanto non è possibile passare più di un parametro ai delegate
+        static int MultipleApply2(int n){return 2 * n;}
+        static int MultipleApply3(int n) { return 3 * n; }
+        static int MultipleApply4(int n) { return 4 * n; }
+        static int MultipleApply5(int n) { return 5 * n; }
+        static int MultipleApply6(int n) { return 6 * n; }
+        static int MultipleApply7(int n) { return 7 * n; }
+
+        static int MultipleApply9Stringhe(string test) { return 0; }
+
+        [Test]
+        public void PrimoTest()
+        {
+            Func<int, int>[] SequenzaDiFunzioni = { MultipleApply2, 
+                MultipleApply3, MultipleApply4, MultipleApply5, 
+                MultipleApply6, MultipleApply7};
+
+            int[][] expected = { new int[] { 4, 6, 8 }, new int[] { 10, 12, 14 } };
+            Assert.That(SequenzaDiFunzioni.MultipleApply(2,3), Is.EqualTo(expected));
+        }
+
+        [Test]
+        public void SecondoTest()
+        {
+            Func<string, int>[] SequenzaDiFunzioni =
+                {   MultipleApply9Stringhe, MultipleApply9Stringhe, MultipleApply9Stringhe,
+                    MultipleApply9Stringhe, MultipleApply9Stringhe, MultipleApply9Stringhe,
+                    MultipleApply9Stringhe, MultipleApply9Stringhe, MultipleApply9Stringhe};
+            Assert.Throws<Exception>(() => SequenzaDiFunzioni.MultipleApply("boom", 2));
+        }
+
+        [Test]
+        public void TerzoTest()
+        {
+
+        }
+
+
+    }
+
 
 }

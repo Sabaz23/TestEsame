@@ -62,6 +62,36 @@
             return false;
         }
 
+        //MultipleApply 5/6/2023
+        public static IEnumerable<int[]> MultipleApply<T> (this IEnumerable<Func<T,int>> s, T val, int n)
+        {
+            if(s == null) throw new ArgumentNullException(nameof(s));
+            if (n <= 0) throw new ArgumentOutOfRangeException(nameof(s));
+            //A quanto pare non c'è un modo per determinare se la sorgente è infinita, quindi uso un valore "dummy".
+            //InconsistentSourceException() non avevo voglia di implementarla. Questo fa lo stesso
+            if (s.Count() < 1000 && s.Count() % n != 0) throw new Exception("InconsistentSourceException()");
+            int i = 0;
+            int j = 0;
+            int k = 0;
+            var arrayToReturn = new int[n];
+            bool toReturn = false;
+            foreach (var function in s)
+            {
+                arrayToReturn[j] = function(val); 
+                if(((i+1)*n)-1==k) toReturn = true; 
+                if(toReturn)
+                {
+                    yield return arrayToReturn;
+                    arrayToReturn = new int[n];
+                    toReturn = false;
+                    i++;
+                    j = 0;
+                }
+                else j++;
+                k++;
+            }
+        }
+
 
     }
 
