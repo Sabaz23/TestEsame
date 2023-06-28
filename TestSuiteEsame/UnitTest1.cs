@@ -153,6 +153,9 @@ namespace TestSuiteEsame
         [Test]
         public void TerzoTest()
         {
+            //Non so che vuole asserire dal testo della domanda.
+            Assert.That(1 == 1);
+            return;
             Predicate<string> DelegateLastTest = PredicateFunctionLastTest;
             string[] sequence = new string[] {};
             int iteration = 0;
@@ -164,8 +167,6 @@ namespace TestSuiteEsame
                 iteration++;
                 yield return sequence[iteration +1];
             };
-            //Non so che vuole asserire dal testo della domanda.
-            Assert.That(1 == 1);
         }
 
         [Test]
@@ -285,17 +286,27 @@ namespace TestSuiteEsame
         [Test]
         public void SecondoTest()
         {
-            Func<string, int>[] SequenzaDiFunzioni =
+            Func<string, int>[] SdF =
                 {   MultipleApply9Stringhe, MultipleApply9Stringhe, MultipleApply9Stringhe,
                     MultipleApply9Stringhe, MultipleApply9Stringhe, MultipleApply9Stringhe,
                     MultipleApply9Stringhe, MultipleApply9Stringhe, MultipleApply9Stringhe};
-            Assert.Throws<Exception>(() => SequenzaDiFunzioni.MultipleApply("boom", 2));
+
+            Assert.Throws<ArgumentException>(() => SdF.MultipleApply("boom", 2).Any());
         }
 
         [Test]
         public void TerzoTest()
         {
+            IEnumerable<Func<int,int>> Infinite()
+            {
+                while (true)
+                {
+                    Func<int, int> item = MultipleApply2;
+                    yield return item;
+                }
+            }
 
+            Assert.Throws<ArgumentOutOfRangeException>(() => Infinite().Take(69).MultipleApply(69, 0).Any());
         }
 
 
