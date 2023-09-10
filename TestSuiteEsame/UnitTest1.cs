@@ -334,19 +334,25 @@ namespace TestSuiteEsame
         [Test]
         public void Test2([Range(1, 10)] int howMany)
         {
-            if (!(howMany < 0)) Assert.Inconclusive();
-            static IEnumerable M(int i) { var x = 0; while (true) yield return x += i; }
+            if (howMany < 0) Assert.Inconclusive();
+            static IEnumerable M(int i) { var x = 0; while (true) yield return x += i;}
+            IEnumerable<int> Infinite(int i)
+            {
+                var x = 0; 
+                while (true) yield return x += i;
+            }
             var source = new IEnumerable<int>[10];
             for (int i = 0; i < 10; i++)
-                source[i] = (IEnumerable<int>)M(i);
+                source[i] = Infinite(i).Take(10);
+                //source[i] = (IEnumerable<int>)M(i) <--è la versione della prof ma non funziona (InvalidCastException)
             var receiver = new MultipleEnumerable<int>(source).GetEnumerator();
             Assert.Multiple(() => {
                 for (int i = 0; i < 10; i++)
                 {
                     var expected = new int[10];
                     for (int j = 0; j < 10; j++) expected[j] = j * i;
-                    receiver.MoveNext();
                     Assert.That(receiver.Current, Is.EqualTo(expected));
+                    receiver.MoveNext();
                 }
             });
         }
