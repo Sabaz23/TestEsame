@@ -1,4 +1,6 @@
-﻿namespace LogicaEsami
+﻿using System.Collections;
+
+namespace LogicaEsami
 {
     //Classi per Lookup
     public interface IIdentified
@@ -95,6 +97,56 @@
 
     }
 
+
+    //Esame del 03/07/2023
+    public class MultipleEnumerable<T> : IEnumerable<T[]>
+    {
+        IEnumerable<T>[] Source { get; }
+        public MultipleEnumerable(IEnumerable<T>[] source)
+        {
+            Source = source;
+        }
+        public IEnumerator<T[]> GetEnumerator()
+        {
+            return new MultipleEnumerator<T>(Source.Select(e => e.GetEnumerator()).ToArray());
+        }
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+    }
+    public class MultipleEnumerator<T> : IEnumerator<T[]>
+    {
+        IEnumerator<T>[] Enumerators { get; }
+        public MultipleEnumerator(IEnumerator<T>[] enumerators)
+        {
+            Enumerators = enumerators;
+        }
+        public bool MoveNext()
+        {
+            foreach (var e in Enumerators)
+                if (!(e.MoveNext())) return false;
+            return true;
+        }
+        public void Reset()
+        {
+            foreach (var e in Enumerators)
+                e.Reset();
+        }
+        public T[] Current
+        {
+            get { return Enumerators.Select(e => e.Current).ToArray(); }
+        }
+        object IEnumerator.Current
+        {
+            get { return /*this.*/Current; }
+        }
+        public void Dispose()
+        {
+            foreach (var e in Enumerators)
+                e.Dispose();
+        }
+    }
 
 
 
