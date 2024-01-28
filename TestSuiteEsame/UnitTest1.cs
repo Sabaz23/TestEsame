@@ -5,6 +5,7 @@ using System.Security.Cryptography.X509Certificates;
 using Assert = NUnit.Framework.Assert;
 using System.Xml.Linq;
 using System.Collections;
+using TestContext = NUnit.Framework.TestContext;
 
 namespace TestSuiteEsame
 {
@@ -414,6 +415,89 @@ namespace TestSuiteEsame
             // Verify that Dispose was called once for each inner IEnumerator<int>
             mockEnumerator.Verify(e => e.Dispose(), Times.Exactly(5));
         }
+    }
+
+
+    //Esame Settembre 2023
+    [TestFixture]
+    public class TestPlayingCards
+    {
+        [TestCase(new Cards[] { Cards.Ace, Cards.Queen, Cards.Two, Cards.Jack, Cards.King, Cards.Seven },
+                  new Suits[] { Suits.Spades, Suits.Clubs, Suits.Diamonds, Suits.Spades, Suits.Hearts, Suits.Diamonds})]
+        public void TestUno(Cards[] cards, Suits[] suits)
+        {
+            if (cards.Length != suits.Length) Assert.Inconclusive();
+            if (cards.Length % 3 != 0 || suits.Length % 3 != 0) Assert.Inconclusive();
+            int i = 0;
+            var z = 0;
+
+            IEnumerable<IPlayingCard> playingDeck()
+            {
+                while(i<cards.Length)
+                {
+                    var card = new Mock<IPlayingCard>();
+                    card.SetupGet(x => x.Suit).Returns(suits[i]);
+                    card.SetupGet(x => x.Value).Returns(cards[i]);
+                    var cTr = card.Object;
+                    yield return cTr;
+                    z++;
+                    if (z != 0 && z % 2 == 0) i++;
+                }
+            }
+            var expectedResults = new bool[cards.Length / 3];
+            
+            for (int k = 0; k<expectedResults.Length;k++)
+            {
+                expectedResults[k] = true;
+            }
+
+            var actualResults = playingDeck().FirstWins().ToArray();
+
+            Assert.That(actualResults, Is.EqualTo(expectedResults));
+        }
+
+        [Test]
+        public void TestDue()
+        {
+            var s = new Mock<IPlayingCard>();
+            IEnumerable<IPlayingCard> Infinite()
+            {
+                while (true)
+                {
+                    var card = new Mock<IPlayingCard>();
+                    Random r = new Random();
+                    card.SetupGet(x => x.Suit).Returns((Suits)r.Next(4));
+                    card.SetupGet(x => x.Value).Returns((Cards)r.Next(10));
+                    var cTr = card.Object;
+                    yield return cTr;
+                }
+            }
+
+            var results = Infinite().Take(10002).FirstWins(); //10002 perchè multiplo di 6
+
+            Assert.That(results.Count() >= 1000);
+        }
+
+        [Test]
+        public void TestTre()
+        {
+            IEnumerable<IPlayingCard> SevenCards()
+            {
+                for(int i=0;i<7;i++)
+                {
+                    var card = new Mock<IPlayingCard>();
+                    Random r = new Random();
+                    card.SetupGet(x => x.Suit).Returns((Suits)r.Next(4));
+                    card.SetupGet(x => x.Value).Returns((Cards)r.Next(10));
+                    var cTr = card.Object;
+                    yield return cTr;
+                }
+            }
+
+            Assert.Throws<ArgumentException>(() => SevenCards().FirstWins().Any());
+
+        }
+
     }
 
 

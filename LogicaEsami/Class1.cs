@@ -94,6 +94,46 @@ namespace LogicaEsami
             }
         }
 
+        //Esame settembre 2023
+        public static IEnumerable<bool> FirstWins<T>(this IEnumerable<T> s) where T: IPlayingCard
+        {
+            
+            if (s == null) throw new ArgumentNullException(nameof(s) + " null");
+            if(s.Count() % 6 != 0 || s.Count() == 0) throw new ArgumentException(nameof(s) + " non multiplo di 6");
+            int i = 0;
+           
+            IPlayingCard[] currentGame = new IPlayingCard[6];
+            foreach (T card in s)
+            {
+                if (i < 6)
+                {
+                    currentGame[i] = card;
+                    i++;
+                }
+                else
+                {
+                    int winningIndex = 0;
+                    for(int k =0; k < 6; k++)
+                    {
+                        
+                        if (currentGame[k] >= currentGame[winningIndex])
+                        {
+                            winningIndex = k;
+                            
+                        }
+
+                    }
+
+                    
+                    if (winningIndex % 2 == 0)
+                        yield return true;
+                    else
+                        yield return false;
+
+                    i = 0;
+                }
+            }
+        }
 
     }
 
@@ -147,6 +187,47 @@ namespace LogicaEsami
                 e.Dispose();
         }
     }
+
+
+    //Esame settembre 2023
+    public enum Cards { Ace, Two, Three, Four, Five, Six, Seven, Jack, Queen, King }
+    public enum Suits { Spades, Clubs, Diamonds, Hearts }
+    public interface IPlayingCard
+    {
+        Cards Value { get; }
+        Suits Suit { get; }
+        static bool operator <=(IPlayingCard first , IPlayingCard second ) {
+
+            if (first.Value == second.Value)
+            {
+                if (first.Suit == second.Suit)
+                    return true;
+                else if (first.Suit < second.Suit)
+                    return true;
+            }
+            else if (first.Value < second.Value)
+                return true;
+
+            return false;
+
+        }
+        static bool operator >=(IPlayingCard first , IPlayingCard second ) {
+
+            if (first.Value == second.Value)
+            {
+                if (first.Suit == second.Suit)
+                    return true;
+                else if (first.Suit > second.Suit)
+                    return true;
+            }
+            else if (first.Value > second.Value)
+                return true;
+
+            return false;
+        }
+    }
+
+ 
 
 
 
