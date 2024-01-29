@@ -423,16 +423,29 @@ namespace TestSuiteEsame
     public class TestPlayingCards
     {
         [TestCase(new Cards[] { Cards.Ace, Cards.Queen, Cards.Two, Cards.Jack, Cards.King, Cards.Seven },
-                  new Suits[] { Suits.Spades, Suits.Clubs, Suits.Diamonds, Suits.Spades, Suits.Hearts, Suits.Diamonds})]
+                  new Suits[] { Suits.Spades, Suits.Clubs, Suits.Diamonds, Suits.Spades, Suits.Hearts, Suits.Diamonds })]
         public void TestUno(Cards[] cards, Suits[] suits)
         {
             if (cards.Length != suits.Length) Assert.Inconclusive();
             if (cards.Length % 3 != 0 || suits.Length % 3 != 0) Assert.Inconclusive();
-            int i = 0;
-            var z = 0;
 
+            /*IEnumerable<IPlayingCard> playingDeck = Enumerable.Range(0, cards.Length*2).Select(_ =>
+            {
+                int f = z;
+                int j = i;
+                if (f != 0 && f % 2 == 0) j++;
+                var cardMock = new Mock<IPlayingCard>();
+                
+                cardMock.SetupGet(o => o.Suit).Returns(suits[j]);
+                cardMock.SetupGet(o => o.Value).Returns(cards[j]);
+                f++;
+                return cardMock.Object;
+            });*/
+            
             IEnumerable<IPlayingCard> playingDeck()
             {
+                int z = 0;
+                int i = 0;
                 while(i<cards.Length)
                 {
                     var card = new Mock<IPlayingCard>();

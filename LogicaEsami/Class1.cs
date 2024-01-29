@@ -99,23 +99,26 @@ namespace LogicaEsami
         {
             
             if (s == null) throw new ArgumentNullException(nameof(s) + " null");
-            if(s.Count() % 6 != 0 || s.Count() == 0) throw new ArgumentException(nameof(s) + " non multiplo di 6");
+            if (s.Count() % 6 != 0 || s.Count() == 0) throw new ArgumentException(nameof(s) + " non multiplo di 6");
+            
             int i = 0;
-           
+            
             IPlayingCard[] currentGame = new IPlayingCard[6];
+            
             foreach (T card in s)
             {
+                
                 if (i < 6)
-                {
-                    currentGame[i] = card;
+                {       
+                    currentGame[i] = card;   
                     i++;
                 }
                 else
                 {
                     int winningIndex = 0;
+                    
                     for(int k =0; k < 6; k++)
                     {
-                        
                         if (currentGame[k] >= currentGame[winningIndex])
                         {
                             winningIndex = k;
@@ -124,7 +127,7 @@ namespace LogicaEsami
 
                     }
 
-                    
+                    Console.WriteLine(winningIndex);
                     if (winningIndex % 2 == 0)
                         yield return true;
                     else
